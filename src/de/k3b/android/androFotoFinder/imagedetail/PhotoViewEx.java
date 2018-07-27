@@ -38,17 +38,17 @@ public class PhotoViewEx extends PhotoView {
     }
 
     ///** Required to have my own enhanced attacher that contains the additional functionality */
-    //protected IPhotoViewAttacher onCreatePhotoViewAttacher(PhotoView photoView) {
-    //    mAttacher = new PhotoViewAttacherEx(photoView);
-    //    return mAttacher;
-    //}
+    protected IPhotoViewAttacher onCreatePhotoViewAttacher(PhotoView photoView) {
+        mAttacher = new PhotoViewAttacherEx(photoView);
+        return mAttacher;
+    }
 
     /** k3b 20150913 #10: Faster initial loading: initially the view is loaded with low res image.
      * on first zoom it is reloaded with this uri */
     public void setImageReloadFile(File file) {
-        if (mAttacher == null) {
-            mAttacher = new PhotoViewAttacherEx(PhotoViewEx.this);
-        }
+    //    if (mAttacher == null) {
+    //        mAttacher = new PhotoViewAttacherEx(PhotoViewEx.this);
+    //    }
         mAttacher.setImageReloadFile(file);
     }
 

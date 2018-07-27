@@ -15,7 +15,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
                    $(call all-java-files-under, libs/k3b-geoHelper-1.1.5/src) \
                    $(call all-java-files-under, libs/kxml2-kxml-parent-2.2.3/src) \
                    $(call all-java-files-under, libs/metadata-extractor-2.10.1/src) \
-                   $(call all-java-files-under, libs/PhotoView-1.2.6.k3b-SNAPSHOT/src) \
+                   $(call all-java-files-under, libs/PhotoView-1.2.6.k3b-5-SNAPSHOT/src) \
                    $(call all-java-files-under, libs/slf4j-android-1.7.7-1/src) \
                    $(call all-java-files-under, libs/mapsforge-0.8.0/mapsforge-core/src) \
                    $(call all-java-files-under, libs/mapsforge-0.8.0/mapsforge-map/src) \
@@ -30,8 +30,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
 
 LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/libs/osmdroid-osmdroid-parent-6.0.1/osmdroid-android/res \
         $(LOCAL_PATH)/libs/androidsvg-Release_1.2.2-beta-1/res \
-        $(LOCAL_PATH)/libs/PhotoView-1.2.6.k3b-SNAPSHOT/res \
         $(appcompat_dir) $(LOCAL_PATH)/res
+        ##$(LOCAL_PATH)/libs/PhotoView-1.2.6.k3b-SNAPSHOT/res \
 
 LOCAL_AAPT_FLAGS := --auto-add-overlay
 

@@ -25,19 +25,23 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.widget.ImageView;
 
-import java.io.File;
-
 import uk.co.senab.photoview.PhotoViewAttacher.OnMatrixChangedListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnViewTapListener;
 
 public class PhotoView extends ImageView implements IPhotoView {
 
+    public interface IPhotoViewAttacher extends IPhotoView {
+        ImageView getImageView();
+        void update(String why);
+        void cleanup();
+    }
+
     // for debug purposes
     private static int lastDebugId = 1;
     private final String mDebugId;
 
-    private PhotoViewAttacher mAttacher;
+    private IPhotoViewAttacher mAttacher;
 
     private ScaleType mPendingScaleType;
 
@@ -52,7 +56,7 @@ public class PhotoView extends ImageView implements IPhotoView {
     public PhotoView(Context context, AttributeSet attr, int defStyle) {
         super(context, attr, defStyle);
         // for debug purposes
-        this.mDebugId = "PhotoView#" + (++lastDebugId);
+        this.mDebugId = getClass().getSimpleName() + "#" + (++lastDebugId);
 
         super.setScaleType(ScaleType.MATRIX);
         init();
@@ -61,18 +65,23 @@ public class PhotoView extends ImageView implements IPhotoView {
     // for debug purposes
     @Override
     public String toString() {
-        return mDebugId;
+        return mDebugId + "-" + mAttacher;
     }
 
     protected void init() {
         if (null == mAttacher || null == mAttacher.getImageView()) {
-            mAttacher = new PhotoViewAttacher(this);
+            mAttacher = onCreatePhotoViewAttacher(this);
         }
 
         if (null != mPendingScaleType) {
             setScaleType(mPendingScaleType);
             mPendingScaleType = null;
         }
+    }
+
+    /** can be overwritten if you need an extended attacher */
+    protected IPhotoViewAttacher onCreatePhotoViewAttacher(PhotoView photoView) {
+        return new PhotoViewAttacher(photoView);
     }
 
     /**
@@ -176,7 +185,7 @@ public class PhotoView extends ImageView implements IPhotoView {
     public void setImageResource(int resId) {
         super.setImageResource(resId);
         if (null != mAttacher) {
-            mAttacher.update("setImageResource");
+            mAttacher.update("setImageResource(" + resId + ")");
         }
     }
 
@@ -184,7 +193,7 @@ public class PhotoView extends ImageView implements IPhotoView {
     public void setImageURI(Uri uri) {
         super.setImageURI(uri);
         if (null != mAttacher) {
-            mAttacher.update("setImageURI");
+            mAttacher.update("setImageURI(" + uri +")");
         }
     }
 
@@ -278,10 +287,5 @@ public class PhotoView extends ImageView implements IPhotoView {
     protected void onAttachedToWindow() {
         init();
         super.onAttachedToWindow();
-    }
-
-    /** k3b 20150913 #10: Faster initial loading: initially the view is loaded with low res image. on first zoom it is reloaded with this uri */
-    public void setImageReloadFile(File file) {
-        mAttacher.setImageReloadFile(file);
     }
 }

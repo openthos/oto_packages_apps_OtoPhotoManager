@@ -24,9 +24,6 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
-import android.util.Log;
-
-import android.os.Build;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,9 +34,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.Toast;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 
 import uk.co.senab.photoview.gestures.OnGestureListener;
@@ -51,9 +46,7 @@ import static android.view.MotionEvent.ACTION_CANCEL;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_UP;
 
-import de.k3b.android.androFotoFinder.R;
-
-public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
+public class PhotoViewAttacher implements PhotoView.IPhotoViewAttacher, View.OnTouchListener,
         OnGestureListener,
         ViewTreeObserver.OnGlobalLayoutListener {
 
@@ -62,14 +55,13 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
     // let debug flag be dynamic, but still Proguard can be used to remove from
     // release builds
-    // contoll logging via LogManager.setDebugEnabled(boolean enabled);
+    // controll logging via LogManager.setDebugEnabled(boolean enabled);
     // public to allow customer settings-activity to change this
-    public static boolean DEBUG = true; //!!! Log.isLoggable(LOG_TAG, Log.DEBUG);
+    public static boolean DEBUG = false; // Log.isLoggable(LOG_TAG, Log.DEBUG);
 
-    static final Interpolator sInterpolator = new AccelerateDecelerateInterpolator();
-
-    /** my android 4.4 cannot process images bigger than 4096*4096. -1 means must be calculated from openGL  */
-    private static int MAX_IMAGE_DIMENSION = -1; // will be set to 4096
+    // for debug purposes
+    private static int lastDebugId = 1;
+    private final String mDebugId;
 
     private Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
     int ZOOM_DURATION = DEFAULT_ZOOM_DURATION;
@@ -88,8 +80,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
     private boolean mAllowParentInterceptOnEdge = true;
     private boolean mBlockParentIntercept = false;
 
-    /** k3b 20150913 #10: Faster initial loading: initially the view is loaded with low res image. on first zoom it is reloaded with this uri */
-    private File mImageReloadFile = null;
+    /** k3b needed to restore focus when layout changes (rotation, hide NavigationDrawer,...) */
     private double mLastFocusX = Double.NaN;
     private double mLastFocusY = Double.NaN;
 
@@ -178,6 +169,12 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
     }
 
     public PhotoViewAttacher(ImageView imageView, boolean zoomable) {
+        this.mDebugId = getClass().getSimpleName() + "#" + (++lastDebugId);
+
+        if (DEBUG) {
+            LogManager.getLogger().d(LOG_TAG,"creating " + this + " for " + imageView);
+        }
+
         mImageView = new WeakReference<>(imageView);
 
         imageView.setDrawingCacheEnabled(true);
@@ -271,7 +268,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         }
 
         if (DEBUG) {
-            LogManager.getLogger().d(LOG_TAG,"cleanup");
+            LogManager.getLogger().d(LOG_TAG,"cleanup of " + this);
         }
 
         final ImageView imageView = mImageView.get();
@@ -335,7 +332,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         mBaseRotation = degrees % 360;
         update("setBaseRotation");
         setRotationBy(mBaseRotation);
-        checkAndDisplayMatrix("setBaseRotation");
+        checkAndDisplayMatrix("setBaseRotation(" + degrees + ")");
     }
 
     /**
@@ -344,19 +341,19 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
     @Override
     public void setPhotoViewRotation(float degrees) {
         mSuppMatrix.setRotate(degrees % 360);
-        checkAndDisplayMatrix("setPhotoViewRotation");
+        checkAndDisplayMatrix("setPhotoViewRotation(" + degrees + ")");
     }
 
     @Override
     public void setRotationTo(float degrees) {
         mSuppMatrix.setRotate(degrees % 360);
-        checkAndDisplayMatrix("setRotationTo");
+        checkAndDisplayMatrix("setRotationTo(" + degrees + ")");
     }
 
     @Override
     public void setRotationBy(float degrees) {
         mSuppMatrix.postRotate(degrees % 360);
-        checkAndDisplayMatrix("setRotationBy");
+        checkAndDisplayMatrix("setRotationBy(" + degrees + ")");
     }
 
     public ImageView getImageView() {
@@ -508,40 +505,14 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
                             scaleFactor, focusX, focusY));
         }
 
-        /** k3b 20150913 #10: Faster initial loading: initially the view is loaded with low res image. on first zoom it is reloaded with this uri */
-        if (mImageReloadFile != null) {
-            ImageView imageView = getImageView();
-            if (imageView != null) {
-                if (DEBUG) {
-                    // !!!
-                    LogManager.getLogger().d(
-                            LOG_TAG,
-                            "onScale: Reloading image from " + mImageReloadFile);
-                }
-                try {
-                    if (MAX_IMAGE_DIMENSION < 0) {
-                        MAX_IMAGE_DIMENSION = (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) ? 4096 : HugeImageLoader.getMaxTextureSize();
-                    }
-                    imageView.setImageBitmap(HugeImageLoader.loadImage(mImageReloadFile.getAbsoluteFile(), MAX_IMAGE_DIMENSION, MAX_IMAGE_DIMENSION));
-                } catch (OutOfMemoryError e) {
-                    String errorMessage = imageView.getContext().getString(R.string.err_low_memory, mImageReloadFile);
-                    Toast.makeText(imageView.getContext(), errorMessage, Toast.LENGTH_LONG).show();
-
-                    LogManager.getLogger().e(
-                            LOG_TAG,
-                            "onScale: Not enought memory to reloading image from " + mImageReloadFile + " failed: " + e.getMessage());
-                }
-
-                mImageReloadFile = null; // either success or error: do not try it again
-            }
-        }
-
-        if (getScale() < mMaxScale || scaleFactor < 1f) {
+        if ((getScale() < mMaxScale || scaleFactor < 1f) && (getScale() > mMinScale || scaleFactor > 1f)) {
             if (null != mScaleChangeListener) {
                 mScaleChangeListener.onScaleChange(scaleFactor, focusX, focusY);
             }
+            /** k3b neccessary to restore focus when layout changes (rotation, hide NavigationDrawer,...) */
             mLastFocusX=focusX;
             mLastFocusY=focusY;
+
             mSuppMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
             checkAndDisplayMatrix("onScale");
         }
@@ -724,7 +695,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
             mScaleType = scaleType;
 
             // Finally update
-            update("setScaleType");
+            update("setScaleType(" + scaleType + ")");
         }
     }
 
@@ -1033,10 +1004,10 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         return imageView.getHeight() - imageView.getPaddingTop() - imageView.getPaddingBottom();
     }
 
-    /** k3b 20150913 #10: Faster initial loading: initially the view is loaded with low res image. on first zoom it is reloaded with this uri
-     * @param imageReloadURI*/
-    public void setImageReloadFile(File imageReloadURI) {
-        this.mImageReloadFile = imageReloadURI;
+    // for debug purposes
+    @Override
+    public String toString() {
+        return mDebugId;
     }
 
     /**
