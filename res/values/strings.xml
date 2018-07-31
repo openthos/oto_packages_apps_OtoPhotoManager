@@ -19,6 +19,7 @@
  */
  -->
 <resources>
+    <string name="app_name">A Photo Manager</string>
     <string name="about_summary">About \"A Photo Manager%1$s\"</string>
     <string name="area_menu_title">Map Area Filter</string>
     <string name="background">Background</string>

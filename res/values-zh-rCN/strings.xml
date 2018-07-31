@@ -21,6 +21,7 @@
  */
  -->
 <resources>
+    <string name="app_name">图片管理器</string>
   <string name="about_summary">关于“照片管理器%1$s”</string>
   <string name="area_menu_title">地图区域筛选</string>
   <string name="background">背景</string>
