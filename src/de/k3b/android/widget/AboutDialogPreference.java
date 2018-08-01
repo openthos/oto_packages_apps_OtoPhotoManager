@@ -108,19 +108,6 @@ public class AboutDialogPreference extends DialogPreference {
         final AlertDialog.Builder alert = new AlertDialog.Builder(context);
         alert.setTitle(getAboutTitle(context));
         alert.setIcon(R.drawable.foto_gallery);
-        alert.setNeutralButton(android.R.string.cancel,
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(
-                            final DialogInterface paramDialogInterface,
-                            final int paramInt) {
-                        paramDialogInterface.cancel();
-
-                    }
-                }
-        );
-
         final WebView wv =  setAboutText(context, new WebView(context));
         alert.setView(wv);
 

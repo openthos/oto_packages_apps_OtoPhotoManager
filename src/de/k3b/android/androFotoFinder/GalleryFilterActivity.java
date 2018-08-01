@@ -225,19 +225,8 @@ public class GalleryFilterActivity extends ActivityWithAutoCloseDialogs
                 MapGeoPickerActivity.showActivity(this, null, getAsGalleryFilter());
                 return true;
             }
-
-
             case R.id.action_save_as:
                 mBookmarkController.onSaveAsQuestion(mBookmarkController.getlastBookmarkFileName(), getAsQuery());
-                return true;
-            case R.id.action_load_from:
-                mBookmarkController.onLoadFromQuestion(new BookmarkController.IQueryConsumer() {
-                    @Override
-                    public void setQuery(String fileName, QueryParameter newQuery) {
-                        IGalleryFilter filter = TagSql.parseQueryEx(newQuery, false);
-                        toGui(filter);
-                    }
-                }, getAsQuery());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -578,14 +578,8 @@ public class FotoGalleryActivity extends LocalizedActivity implements Common,
             case R.id.cmd_select_lat_lon:
                 openLatLonPicker();
                 return true;
-            case R.id.cmd_select_tag:
-                openTagPicker();
-                return true;
             case R.id.cmd_filter:
                 openFilter();
-                return true;
-            case R.id.cmd_load_bookmark:
-                loadBookmark();
                 return true;
             case R.id.cmd_sort_date:
                 this.mGalleryQueryParameter.setSortID(FotoSql.SORT_BY_DATE);
@@ -645,9 +639,6 @@ public class FotoGalleryActivity extends LocalizedActivity implements Common,
 
     }
 
-    private void loadBookmark() {
-        mBookmarkController.onLoadFromQuestion(mLoadBookmarkResultConsumer, this.mGalleryQueryParameter.calculateEffectiveGalleryContentQuery());
-    }
     /**
      * Call back from sub-activities.<br/>
      * Process Change StartTime (longpress start), Select StopTime before stop
@@ -709,17 +700,6 @@ public class FotoGalleryActivity extends LocalizedActivity implements Common,
                 this.mGalleryQueryParameter.mCurrentLatLonFromGeoAreaPicker, OsmdroidUtil.NO_ZOOM, mSelectedItems, null);
 
         dialog.show(manager, DLG_NAVIGATOR_TAG);
-    }
-
-    private void openTagPicker() {
-        mGalleryQueryParameter.mCurrentSubFilterMode = GalleryQueryParameter.SUB_FILTER_MODE_TAG;
-
-        final FragmentManager manager = getFragmentManager();
-        TagsPickerFragment dlg = new TagsPickerFragment();
-        dlg.setFragmentOnwner(this);
-        dlg.setTitleId(R.string.tags_activity_title);
-        dlg.setAddNames(mGalleryQueryParameter.mCurrentTagsFromPicker);
-        dlg.show(manager, DLG_NAVIGATOR_TAG);
     }
 
     /** called by {@link TagsPickerFragment} */
