@@ -7,10 +7,10 @@ appcompat_dir := $(LOCAL_PATH)/../../../prebuilts/sdk/current/support/v7/appcomp
 
 LOCAL_STATIC_JAVA_LIBRARIES += android-support-v4
 LOCAL_STATIC_JAVA_LIBRARIES += android-support-v7-appcompat
+LOCAL_STATIC_JAVA_LIBRARIES += imageloader
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
                    $(call all-java-files-under, libs/fotolib2/src) \
-                   $(call all-java-files-under, libs/Android-Universal-Image-Loader-1.9.5/src) \
                    $(call all-java-files-under, libs//androidsvg-Release_1.2.2-beta-1/src) \
                    $(call all-java-files-under, libs/k3b-geoHelper-1.1.5/src) \
                    $(call all-java-files-under, libs/kxml2-kxml-parent-2.2.3/src) \
