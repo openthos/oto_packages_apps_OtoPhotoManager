@@ -48,7 +48,24 @@
     asset folder.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE">
+        <group
+            gid="sdcard_rw"
+            tools:ignore="MissingPrefix" />
+        <group
+            gid="media_rw"
+            tools:ignore="MissingPrefix" />
+    </uses-permission>
+    <uses-permission
+        android:name="android.permission.WRITE_MEDIA_STORAGE"
+        tools:ignore="ProtectedPermissions">
+        <group
+            gid="sdcard_rw"
+            tools:ignore="MissingPrefix" />
+        <group
+            gid="media_rw"
+            tools:ignore="MissingPrefix" />
+    </uses-permission>
     <!--
          permission ACCESS_NETWORK_STATE and ACCESS_WIFI_STATE
         osmdroid can find out if internet is available and if it is wlan or cellphone-network to decide

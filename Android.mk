@@ -3,10 +3,10 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
-appcompat_dir := $(LOCAL_PATH)/../../../prebuilts/sdk/current/support/v7/appcompat/res
+#appcompat_dir := $(LOCAL_PATH)/../../../prebuilts/sdk/current/support/v7/appcompat/res
 
 LOCAL_STATIC_JAVA_LIBRARIES += android-support-v4
-LOCAL_STATIC_JAVA_LIBRARIES += android-support-v7-appcompat
+#LOCAL_STATIC_JAVA_LIBRARIES += android-support-v7-appcompat
 LOCAL_STATIC_JAVA_LIBRARIES += imageloader
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
@@ -30,13 +30,13 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
 
 LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/libs/osmdroid-osmdroid-parent-6.0.1/osmdroid-android/res \
         $(LOCAL_PATH)/libs/androidsvg-Release_1.2.2-beta-1/res \
-        $(appcompat_dir) $(LOCAL_PATH)/res
-        ##$(LOCAL_PATH)/libs/PhotoView-1.2.6.k3b-SNAPSHOT/res \
+        $(LOCAL_PATH)/res
 
 LOCAL_AAPT_FLAGS := --auto-add-overlay
 
 LOCAL_PACKAGE_NAME := OtoPhoto
 
+LOCAL_SDK_VERSION := 21
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true
@@ -44,6 +44,3 @@ LOCAL_OVERRIDES_PACKAGES := Gallery2 \
                             Music
 
 include $(BUILD_PACKAGE)
-
-# Use the folloing include to make our test apk.
-include $(call all-makefiles-under,$(LOCAL_PATH))
