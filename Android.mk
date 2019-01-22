@@ -35,8 +35,11 @@ LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/libs/osmdroid-osmdroid-parent-6.0.1/osmdroid
 LOCAL_AAPT_FLAGS := --auto-add-overlay
 
 LOCAL_PACKAGE_NAME := OtoPhoto
-
-LOCAL_SDK_VERSION := 21
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -eq 22 && echo Lollipop), Lollipop)
+         LOCAL_SDK_VERSION := current
+else
+        LOCAL_SDK_VERSION := 22
+endif
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true
